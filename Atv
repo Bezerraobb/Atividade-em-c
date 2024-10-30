@@ -1,1 +1,165 @@
-teste
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct elemento {
+    int posicao;
+    int valor;
+} Elemento;
+
+typedef struct listaEncadeada {
+    Elemento *itens[50];
+    int totalElementos;
+} ListaEncadeada;
+
+ListaEncadeada* criarLista() {
+    ListaEncadeada *lista = (ListaEncadeada*)malloc(sizeof(ListaEncadeada));
+    if (lista != NULL) {
+        lista->totalElementos = 0;
+    }
+    return lista;
+}
+
+void exibirLista(ListaEncadeada *lista) {
+    int i;
+    printf("Lista: \" ");
+    for (i = 0; i < lista->totalElementos; i++) {
+        printf("%i - %i | ", lista->itens[i]->posicao, lista->itens[i]->valor);
+    }
+    printf("\"\n");
+}
+
+int inserirLista(ListaEncadeada *lista, Elemento *elemento) {
+    if (lista->totalElementos == 50) {
+        printf("Lista cheia\n");
+        return 0;
+    } else {
+        lista->itens[lista->totalElementos] = elemento;
+        lista->totalElementos++;
+        printf("Elemento inserido\n");
+        return 1;
+    }
+}
+
+int verificarVazia(ListaEncadeada *lista) {
+    return lista->totalElementos == 0;
+}
+
+Elemento *buscarElemento(ListaEncadeada *lista, int posicao) {
+    int i;
+    if (lista->totalElementos == 0) {
+        printf("Lista Vazia\n");
+        return NULL;
+    }
+    for (i = 0; i < lista->totalElementos; i++) {
+        if (lista->itens[i]->posicao == posicao) {
+            return lista->itens[i];
+        }
+    }
+    return NULL;
+}
+
+void liberarLista(ListaEncadeada *lista) {
+    for (int i = 0; i < lista->totalElementos; i++) {
+        free(lista->itens[i]);
+    }
+    free(lista);
+}
+
+void excluirElemento(ListaEncadeada *lista, int posicao) {
+    int i, index = -1;
+    for (i = 0; i < lista->totalElementos; i++) {
+        if (lista->itens[i]->posicao == posicao) {
+            free(lista->itens[i]);
+            index = i;
+            break;
+        }
+    }
+    if (index == -1) {
+        printf("Elemento não encontrado\n");
+        return;
+    }
+
+    for (i = index; i < lista->totalElementos - 1; i++) {
+        lista->itens[i] = lista->itens[i + 1];
+    }
+    lista->totalElementos--;
+}
+
+int inserirListaOrdenada(ListaEncadeada *lista, Elemento *elemento) {
+    if (lista->totalElementos == 50) {
+        printf("Lista cheia\n");
+        return 0;
+    }
+
+    int i;
+
+    for (i = 0; i < lista->totalElementos; i++) {
+        if (lista->itens[i]->valor > elemento->valor) {
+            break;
+        }
+    }
+
+    for (int j = lista->totalElementos; j > i; j--) {
+        lista->itens[j] = lista->itens[j - 1];
+    }
+
+    lista->itens[i] = elemento;
+    lista->totalElementos++;
+    printf("Elemento inserido na ordem correta\n");
+    return 1;
+}
+
+int main() {
+    ListaEncadeada *minhaLista = criarLista();
+    
+    Elemento *elemento1 = (Elemento*)malloc(sizeof(Elemento));
+    elemento1->posicao = 1;
+    elemento1->valor = 8;
+    inserirLista(minhaLista, elemento1);
+
+    Elemento *elemento2 = (Elemento*)malloc(sizeof(Elemento));
+    elemento2->posicao = 2;
+    elemento2->valor = 4;
+    inserirLista(minhaLista, elemento2);
+
+    exibirLista(minhaLista);
+    
+    if (verificarVazia(minhaLista)) {
+        printf("A lista está vazia!\n");
+    } else {
+        printf("A lista não está vazia!\n");
+    }
+
+    Elemento *buscado = buscarElemento(minhaLista, 1);
+    if (buscado != NULL) {
+        printf("Elemento encontrado: %i - %i\n", buscado->posicao, buscado->valor);
+    } else {
+        printf("Elemento não encontrado\n");
+    }
+
+    excluirElemento(minhaLista, 1);
+    exibirLista(minhaLista);
+
+    liberarLista(minhaLista);
+
+    ListaEncadeada *minhaLista2 = criarLista();
+
+    Elemento *novoElemento1 = (Elemento*)malloc(sizeof(Elemento));
+    novoElemento1->posicao = 1;
+    novoElemento1->valor = 20;
+    inserirListaOrdenada(minhaLista2, novoElemento1);
+
+    Elemento *novoElemento2 = (Elemento*)malloc(sizeof(Elemento));
+    novoElemento2->posicao = 2;
+    novoElemento2->valor = 16;
+    inserirListaOrdenada(minhaLista2, novoElemento2);
+
+    Elemento *novoElemento3 = (Elemento*)malloc(sizeof(Elemento));
+    novoElemento3->posicao = 3;
+    novoElemento3->valor = 12;
+    inserirListaOrdenada(minhaLista2, novoElemento3);
+
+    exibirLista(minhaLista2);
+
+    return 0;
+}
